@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- WhatsApp/Facebook Preview -->
+    <meta property="og:title" content="The Adventure Bunny Story">
+    <meta property="og:description" content="A fun interactive storybook for children">
+    <meta property="og:image" content="preview.jpg">
+    <meta property="og:url" content="YOUR_URL_HERE">
+    <meta property="og:type" content="website">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FFB6C1">
+    
+    <title>Kids Story Book</title>
+    <style>
+        /* ===== KID-FRIENDLY STYLES ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: linear-gradient(135deg, #FFE6E6 0%, #E6F7FF 100%);
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Arial Rounded MT Bold', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+        
+        /* Animated background elements */
+        .bg-bubble {
+            position: fixed;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            z-index: -1;
+        }
+        
+        .book-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .book {
+            width: 90vw;
+            max-width: 800px; /* 4:5 ratio base */
+            height: calc(90vw * 1.25);
+            max-height: 1000px; /* 800 * 1.25 = 1000 */
+            position: relative;
+            perspective: 1500px;
+            filter: drop-shadow(0 10px 30px rgba(255, 107, 107, 0.3));
+        }
+        
+        /* Book cover effect */
+        .book::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: linear-gradient(45deg, #FFB6C1, #FFD166, #06D6A0, #118AB2);
+            border-radius: 10px;
+            z-index: -1;
+            opacity: 0.7;
+        }
+        
+        .page {
+            width: 50%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            transform-origin: left center;
+            transition: transform 0.8s cubic-bezier(0.42, 0, 0.58, 1);
+            transform-style: preserve-3d;
+            background: #fff9e6;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+            border-radius: 0 5px 5px 0;
+            overflow: hidden;
+        }
+        
+        /* Page corner hover effect */
+        .page:hover::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(225deg, transparent 50%, rgba(255,182,193,0.3) 50%);
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+        
+        .page:hover::after {
+            content: '📖';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 20px;
+            animation: wiggle 1s infinite;
+            z-index: 11;
+        }
+        
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
+        }
+        
+        .page img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* Big colorful navigation buttons */
+        .nav-btn {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(145deg, #FF6B6B, #FF8E53);
+            color: white;
+            border: none;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            font-size: 36px;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .nav-btn:hover {
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.6);
+        }
+        
+        .nav-btn:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+        
+        .nav-btn:disabled {
+            background: #CCCCCC;
+            cursor: not-allowed;
+            transform: translateY(-50%);
+            box-shadow: none;
+        }
+        
+        .prev-btn { left: 20px; }
+        .next-btn { right: 20px; }
+        
+        /* Page counter in a playful style */
+        .page-counter {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(145deg, #06D6A0, #118AB2);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(6, 214, 160, 0.4);
+            border: 3px solid white;
+        }
+        
+        /* Loading indicator with animation */
+        .loader {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            color: #FF6B6B;
+            background: white;
+            padding: 20px 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .loader::after {
+            content: '';
+            width: 30px;
+            height: 30px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #FF6B6B;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Touch areas for mobile (larger for kids) */
+        .touch-area {
+            position: absolute;
+            top: 0;
+            width: 100px;
+            height: 100%;
+            z-index: 50;
+            cursor: pointer;
+        }
+        
+        .touch-left { left: 0; }
+        .touch-right { right: 0; }
+        
+        /* Instructions for first-time users */
+        .instructions {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 80%;
+            border: 3px dashed #FFD166;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-5px); }
+        }
+        
+        .instructions h3 {
+            color: #FF6B6B;
+            margin-bottom: 5px;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #888;
+        }
+        
+        /* Fullscreen button */
+        .fullscreen-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(145deg, #118AB2, #073B4C);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 4px 10px rgba(17, 138, 178, 0.4);
+        }
+        
+        @media (max-width: 768px) {
+            .book {
+                width: 95vw;
+                height: calc(95vw * 1.25);
+            }
+            
+            .nav-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 30px;
+            }
+            
+            .page-counter {
+                font-size: 16px;
+                padding: 10px 20px;
+            }
+            
+            .touch-area {
+                width: 80px;
+            }
+            
+            .instructions {
+                top: 10px;
+                font-size: 14px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .nav-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+                bottom: 20px;
+                top: auto;
+                transform: none;
+            }
+            
+            .prev-btn {
+                left: 20px;
+                bottom: 20px;
+            }
+            
+            .next-btn {
+                right: 20px;
+                bottom: 20px;
+            }
+            
+            .page-counter {
+                top: 20px;
+                bottom: auto;
+                transform: translateX(-50%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated background bubbles -->
+    <div id="bubbles"></div>
+    
+    <div class="book-container">
+        <div class="book" id="book">
+            <!-- Pages will be inserted by JavaScript -->
+        </div>
+        
+        <button class="nav-btn prev-btn" id="prevBtn">←</button>
+        <button class="nav-btn next-btn" id="nextBtn">→</button>
+        
+        <div class="page-counter" id="pageCounter">📖 Page 1 of 20</div>
+        
+        <!-- Touch areas for mobile -->
+        <div class="touch-area touch-left" id="touchLeft"></div>
+        <div class="touch-area touch-right" id="touchRight"></div>
+        
+        <!-- Fullscreen button -->
+        <button class="fullscreen-btn" id="fullscreenBtn">⛶</button>
+        
+        <!-- Loading indicator -->
+        <div class="loader" id="loader">
+            <span>Loading Story...</span>
+        </div>
+    </div>
+    
+    <!-- Instructions popup -->
+    <div class="instructions" id="instructions">
+        <button class="close-btn" id="closeInstructions">×</button>
+        <h3>📚 How to Read</h3>
+        <p>Tap the arrows or swipe to turn pages!</p>
+        <p>Add to Home Screen for offline reading 📱</p>
+    </div>
+    
+    <!-- Hidden audio for page turn sound -->
+    <audio id="pageTurnSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-book-page-turn-1512.mp3" type="audio/mpeg">
+    </audio>
+    
+    <script>
+        // ===== CONFIGURATION =====
+        const TOTAL_PAGES = 20; // Change this for different book lengths
+        let currentPage = 1;
+        let audioEnabled = true;
+        
+        // ===== DOM ELEMENTS =====
+        const book = document.getElementById('book');
+        const loader = document.getElementById('loader');
+        const pageTurnSound = document.getElementById('pageTurnSound');
+        const instructions = document.getElementById('instructions');
+        const closeInstructions = document.getElementById('closeInstructions');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        
+        // ===== INITIAL SETUP =====
+        
+        // Create background bubbles
+        function createBubbles() {
+            const bubbles = document.getElementById('bubbles');
+            const colors = ['#FFB6C1', '#FFD166', '#06D6A0', '#118AB2', '#FF6B6B'];
+            
+            for (let i = 0; i < 15; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bg-bubble';
+                bubble.style.width = Math.random() * 100 + 50 + 'px';
+                bubble.style.height = bubble.style.width;
+                bubble.style.left = Math.random() * 100 + '%';
+                bubble.style.top = Math.random() * 100 + '%';
+                bubble.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                bubble.style.opacity = Math.random() * 0.3 + 0.1;
+                bubble.style.animation = `float ${Math.random() * 20 + 10}s infinite linear`;
+                
+                // Add floating animation
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes float {
+                        0% { transform: translate(0, 0) rotate(0deg); }
+                        25% { transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px) rotate(90deg); }
+                        50% { transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px) rotate(180deg); }
+                        75% { transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px) rotate(270deg); }
+                        100% { transform: translate(0, 0) rotate(360deg); }
+                    }
+                `;
+                document.head.appendChild(style);
+                
+                bubbles.appendChild(bubble);
+            }
+        }
+        
+        // Load all pages
+        function loadPages() {
+            let loadedCount = 0;
+            
+            for (let i = 1; i <= TOTAL_PAGES; i++) {
+                const pageNumber = i.toString().padStart(2, '0');
+                const page = document.createElement('div');
+                page.className = 'page';
+                page.id = `page-${i}`;
+                page.style.left = i % 2 === 1 ? '0%' : '50%';
+                page.style.zIndex = TOTAL_PAGES - i + 1;
+                
+                // Add page turn on click for the corner
+                if (i < TOTAL_PAGES) {
+                    page.addEventListener('click', (e) => {
+                        const rect = page.getBoundingClientRect();
+                        // Only trigger on right side (corner)
+                        if (e.clientX > rect.right - 50 && e.clientY < rect.top + 50) {
+                            nextPage();
+                        }
+                    });
+                }
+                
+                const img = document.createElement('img');
+                img.src = `pages/${pageNumber}.jpg`;
+                img.alt = `Page ${i}`;
+                img.loading = i <= 4 ? 'eager' : 'lazy'; // Load first 4 pages immediately
+                
+                img.onload = function() {
+                    loadedCount++;
+                    if (loadedCount === TOTAL_PAGES) {
+                        // All pages loaded
+                        setTimeout(() => {
+                            loader.style.display = 'none';
+                            showInstructions();
+                        }, 500);
+                    }
+                };
+                
+                img.onerror = function() {
+                    console.error(`Failed to load page ${i}`);
+                    loadedCount++;
+                    if (loadedCount === TOTAL_PAGES) {
+                        loader.style.display = 'none';
+                    }
+                };
+                
+                page.appendChild(img);
+                book.appendChild(page);
+            }
+            
+            updateDisplay();
+        }
+        
+        // ===== PAGE NAVIGATION =====
+        
+        function updateDisplay() {
+            // Update page counter
+            document.getElementById('pageCounter').textContent = 
+                `📖 Page ${currentPage} of ${TOTAL_PAGES}`;
+            
+            // Update button states
+            document.getElementById('prevBtn').disabled = currentPage <= 1;
+            document.getElementById('nextBtn').disabled = currentPage >= TOTAL_PAGES - 1;
+            
+            // Show current spread
+            document.querySelectorAll('.page').forEach(page => {
+                page.style.transform = 'rotateY(0deg)';
+            });
+            
+            // If we're on an odd page, show it and the next page
+            if (currentPage % 2 === 1 && currentPage < TOTAL_PAGES) {
+                const page1 = document.getElementById(`page-${currentPage}`);
+                const page2 = document.getElementById(`page-${currentPage + 1}`);
+                
+                if (page1) page1.style.transform = 'rotateY(0deg)';
+                if (page2) page2.style.transform = 'rotateY(0deg)';
+            }
+        }
+        
+        function nextPage() {
+            if (currentPage < TOTAL_PAGES - 1) {
+                playPageTurnSound();
+                currentPage += 2;
+                updateDisplay();
+                return true;
+            }
+            return false;
+        }
+        
+        function prevPage() {
+            if (currentPage > 1) {
+                playPageTurnSound();
+                currentPage -= 2;
+                updateDisplay();
+                return true;
+            }
+            return false;
+        }
+        
+        // ===== AUDIO FUNCTIONS =====
+        
+        function playPageTurnSound() {
+            if (!audioEnabled) return;
+            
+            try {
+                pageTurnSound.currentTime = 0;
+                pageTurnSound.play().catch(e => {
+                    console.log("Audio play failed:", e);
+                    // User might need to interact first
+                });
+            } catch (e) {
+                console.log("Audio error:", e);
+            }
+        }
+        
+        // ===== INSTRUCTIONS =====
+        
+        function showInstructions() {
+            // Only show instructions on first visit
+            if (!localStorage.getItem('instructionsShown')) {
+                instructions.style.display = 'block';
+                localStorage.setItem('instructionsShown', 'true');
+            }
+        }
+        
+        // ===== FULLSCREEN =====
+        
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+                fullscreenBtn.textContent = '⛶';
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                    fullscreenBtn.textContent = '⛶';
+                }
+            }
+        }
+        
+        // ===== EVENT LISTENERS =====
+        
+        // Navigation buttons
+        document.getElementById('nextBtn').addEventListener('click', nextPage);
+        document.getElementById('prevBtn').addEventListener('click', prevPage);
+        
+        // Touch areas
+        document.getElementById('touchRight').addEventListener('click', nextPage);
+        document.getElementById('touchLeft').addEventListener('click', prevPage);
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') nextPage();
+            if (e.key === 'ArrowLeft') prevPage();
+            if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+        });
+        
+        // Touch/swipe for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+        
+        document.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+        
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    nextPage(); // Swipe left
+                } else {
+                    prevPage(); // Swipe right
+                }
+            }
+        }
+        
+        // Close instructions
+        closeInstructions.addEventListener('click', () => {
+            instructions.style.display = 'none';
+        });
+        
+        // Fullscreen button
+        fullscreenBtn.addEventListener('click', toggleFullscreen);
+        
+        // Fullscreen change event
+        document.addEventListener('fullscreenchange', () => {
+            fullscreenBtn.textContent = document.fullscreenElement ? '⛶' : '⛶';
+        });
+        
+        // ===== PWA SERVICE WORKER =====
+        
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // Simple service worker for offline capability
+                const swContent = `
+                    const CACHE_NAME = 'kids-flipbook-v1';
+                    const urlsToCache = [
+                        './',
+                        './index.html',
+                        './manifest.json',
+                        './preview.jpg'
+                    ];
+                    
+                    self.addEventListener('install', event => {
+                        event.waitUntil(
+                            caches.open(CACHE_NAME)
+                                .then(cache => cache.addAll(urlsToCache))
+                        );
+                    });
+                    
+                    self.addEventListener('fetch', event => {
+                        event.respondWith(
+                            caches.match(event.request)
+                                .then(response => response || fetch(event.request))
+                        );
+                    });
+                `;
+                
+                // Create a Blob with the service worker content
+                const blob = new Blob([swContent], { type: 'application/javascript' });
+                const swURL = URL.createObjectURL(blob);
+                
+                navigator.serviceWorker.register(swURL).catch(err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+        
+        // ===== INITIALIZE =====
+        
+        window.addEventListener('DOMContentLoaded', () => {
+            createBubbles();
+            loadPages();
+            
+            // Enable audio after user interaction (browser requirement)
+            document.addEventListener('click', () => {
+                audioEnabled = true;
+                // Try to play audio to unlock audio context
+                pageTurnSound.volume = 0;
+                pageTurnSound.play().then(() => {
+                    pageTurnSound.pause();
+                    pageTurnSound.currentTime = 0;
+                    pageTurnSound.volume = 1;
+                }).catch(() => {});
+            }, { once: true });
+        });
+        
+        // Handle page visibility (for mobile)
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                // Page became visible again
+                updateDisplay();
+            }
+        });
+    </script>
+</body>
+</html>

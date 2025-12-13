@@ -10,14 +10,15 @@
     <meta property="og:image" content="preview.jpg">
     <meta property="og:url" content="YOUR_URL_HERE">
     <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
     
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#FFB6C1">
     
-    <title>Kids Story Book</title>
+    <title>The Adventurous Bunny - Kids Story Book</title>
     <style>
-        /* ===== KID-FRIENDLY STYLES ===== */
+        /* ===== KID-FRIENDLY STYLES WITH 2:3 RATIO ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
@@ -34,6 +35,7 @@
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.3);
             z-index: -1;
+            animation: float 20s infinite linear;
         }
         
         .book-container {
@@ -45,42 +47,63 @@
             padding: 20px;
         }
         
+        /* BOOK CONTAINER - 2:3 RATIO FOR SPREAD */
         .book {
             width: 90vw;
-            max-width: 800px; /* 4:5 ratio base */
-            height: calc(90vw * 1.25);
-            max-height: 1000px; /* 800 * 1.25 = 1000 */
+            max-width: 1200px; /* Spread width for 2:3 ratio */
+            height: calc(90vw * 0.5); /* 2:3 ratio: height = width * 3/2 / 2 = width * 0.5 */
+            max-height: 800px; /* 1200 * 0.666 = 800 */
             position: relative;
-            perspective: 1500px;
-            filter: drop-shadow(0 10px 30px rgba(255, 107, 107, 0.3));
+            perspective: 2000px;
+            filter: drop-shadow(0 15px 40px rgba(255, 107, 107, 0.3));
         }
         
-        /* Book cover effect */
-        .book::before {
-            content: '';
-            position: absolute;
-            top: -10px;
-            left: -10px;
-            right: -10px;
-            bottom: -10px;
-            background: linear-gradient(45deg, #FFB6C1, #FFD166, #06D6A0, #118AB2);
-            border-radius: 10px;
-            z-index: -1;
-            opacity: 0.7;
-        }
-        
+        /* SINGLE PAGE - 2:3 RATIO */
         .page {
-            width: 50%;
-            height: 100%;
             position: absolute;
+            width: 50%; /* Each page is half the book width */
+            height: 100%;
             top: 0;
             transform-origin: left center;
-            transition: transform 0.8s cubic-bezier(0.42, 0, 0.58, 1);
+            transition: transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             transform-style: preserve-3d;
             background: #fff9e6;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.1);
-            border-radius: 0 5px 5px 0;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            border-radius: 0 8px 8px 0;
             overflow: hidden;
+            backface-visibility: hidden;
+        }
+        
+        /* Left page (even numbers) */
+        .page.left-page {
+            left: 0;
+            transform-origin: right center;
+            border-radius: 8px 0 0 8px;
+        }
+        
+        /* Right page (odd numbers) */
+        .page.right-page {
+            left: 50%;
+            transform-origin: left center;
+        }
+        
+        /* Cover and back cover positioning */
+        .page.cover {
+            left: 50%; /* Cover starts on right side */
+            z-index: 100;
+        }
+        
+        .page.back-cover {
+            left: 0; /* Back cover on left side */
+            z-index: 1;
+        }
+        
+        /* Page content - 2:3 ratio */
+        .page img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Maintains 2:3 aspect ratio */
+            display: block;
         }
         
         /* Page corner hover effect */
@@ -89,34 +112,29 @@
             position: absolute;
             top: 0;
             right: 0;
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(225deg, transparent 50%, rgba(255,182,193,0.3) 50%);
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(225deg, transparent 50%, rgba(255,182,193,0.4) 50%);
             cursor: pointer;
             z-index: 10;
             transition: all 0.3s ease;
+            border-radius: 0 0 0 8px;
         }
         
         .page:hover::after {
             content: '📖';
             position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 20px;
-            animation: wiggle 1s infinite;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            animation: wiggle 1.2s infinite;
             z-index: 11;
         }
         
         @keyframes wiggle {
-            0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(-10deg); }
-            75% { transform: rotate(10deg); }
-        }
-        
-        .page img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(-15deg) scale(1.1); }
+            75% { transform: rotate(15deg) scale(1.1); }
         }
         
         /* Big colorful navigation buttons */
@@ -127,22 +145,22 @@
             background: linear-gradient(145deg, #FF6B6B, #FF8E53);
             color: white;
             border: none;
-            width: 70px;
-            height: 70px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
-            font-size: 36px;
+            font-size: 42px;
             cursor: pointer;
-            z-index: 100;
+            z-index: 1000;
             transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5);
             display: flex;
             align-items: center;
             justify-content: center;
         }
         
         .nav-btn:hover {
-            transform: translateY(-50%) scale(1.1);
-            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.6);
+            transform: translateY(-50%) scale(1.15);
+            box-shadow: 0 12px 30px rgba(255, 107, 107, 0.7);
         }
         
         .nav-btn:active {
@@ -154,25 +172,27 @@
             cursor: not-allowed;
             transform: translateY(-50%);
             box-shadow: none;
+            opacity: 0.5;
         }
         
-        .prev-btn { left: 20px; }
-        .next-btn { right: 20px; }
+        .prev-btn { left: 30px; }
+        .next-btn { right: 30px; }
         
         /* Page counter in a playful style */
         .page-counter {
             position: fixed;
-            bottom: 20px;
+            bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
             background: linear-gradient(145deg, #06D6A0, #118AB2);
             color: white;
-            padding: 12px 25px;
-            border-radius: 30px;
-            font-size: 18px;
+            padding: 15px 30px;
+            border-radius: 35px;
+            font-size: 20px;
             font-weight: bold;
-            box-shadow: 0 4px 15px rgba(6, 214, 160, 0.4);
-            border: 3px solid white;
+            box-shadow: 0 6px 20px rgba(6, 214, 160, 0.5);
+            border: 4px solid white;
+            z-index: 1000;
         }
         
         /* Loading indicator with animation */
@@ -181,25 +201,26 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 24px;
+            font-size: 28px;
             color: #FF6B6B;
             background: white;
-            padding: 20px 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 25px 50px;
+            border-radius: 25px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
+            z-index: 2000;
         }
         
         .loader::after {
             content: '';
-            width: 30px;
-            height: 30px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #FF6B6B;
+            width: 40px;
+            height: 40px;
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #FF6B6B;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            animation: spin 1.2s linear infinite;
         }
         
         @keyframes spin {
@@ -211,9 +232,9 @@
         .touch-area {
             position: absolute;
             top: 0;
-            width: 100px;
+            width: 120px;
             height: 100%;
-            z-index: 50;
+            z-index: 500;
             cursor: pointer;
         }
         
@@ -223,36 +244,49 @@
         /* Instructions for first-time users */
         .instructions {
             position: fixed;
-            top: 20px;
+            top: 25px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.95);
-            padding: 15px 25px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.97);
+            padding: 20px 35px;
+            border-radius: 20px;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.15);
             text-align: center;
-            max-width: 80%;
-            border: 3px dashed #FFD166;
-            animation: bounce 2s infinite;
+            max-width: 85%;
+            border: 4px dashed #FFD166;
+            animation: bounce 2.5s infinite;
+            z-index: 1000;
+            display: none;
         }
         
         @keyframes bounce {
             0%, 100% { transform: translateX(-50%) translateY(0); }
-            50% { transform: translateX(-50%) translateY(-5px); }
+            50% { transform: translateX(-50%) translateY(-8px); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
         }
         
         .instructions h3 {
             color: #FF6B6B;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
+            font-size: 22px;
+        }
+        
+        .instructions p {
+            margin: 8px 0;
+            font-size: 16px;
         }
         
         .close-btn {
             position: absolute;
-            top: 5px;
-            right: 10px;
+            top: 10px;
+            right: 15px;
             background: none;
             border: none;
-            font-size: 20px;
+            font-size: 24px;
             cursor: pointer;
             color: #888;
         }
@@ -260,52 +294,95 @@
         /* Fullscreen button */
         .fullscreen-btn {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            top: 25px;
+            right: 25px;
             background: linear-gradient(145deg, #118AB2, #073B4C);
             color: white;
             border: none;
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
-            font-size: 20px;
+            font-size: 24px;
             cursor: pointer;
-            z-index: 100;
-            box-shadow: 0 4px 10px rgba(17, 138, 178, 0.4);
+            z-index: 1000;
+            box-shadow: 0 6px 15px rgba(17, 138, 178, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .fullscreen-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Book shadow effect */
+        .book-shadow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.1);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .book {
+                max-width: 1000px;
+                max-height: 667px;
+            }
         }
         
         @media (max-width: 768px) {
             .book {
                 width: 95vw;
-                height: calc(95vw * 1.25);
+                height: calc(95vw * 0.5);
+                max-height: 500px;
             }
             
             .nav-btn {
-                width: 60px;
-                height: 60px;
-                font-size: 30px;
+                width: 65px;
+                height: 65px;
+                font-size: 34px;
             }
             
+            .prev-btn { left: 15px; }
+            .next-btn { right: 15px; }
+            
             .page-counter {
-                font-size: 16px;
-                padding: 10px 20px;
+                font-size: 18px;
+                padding: 12px 24px;
+                bottom: 20px;
             }
             
             .touch-area {
-                width: 80px;
+                width: 90px;
             }
             
             .instructions {
-                top: 10px;
+                top: 15px;
+                padding: 15px 25px;
                 font-size: 14px;
+            }
+            
+            .fullscreen-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+                top: 15px;
+                right: 15px;
             }
         }
         
         @media (max-width: 480px) {
+            .book {
+                width: 98vw;
+                height: calc(98vw * 0.5);
+            }
+            
             .nav-btn {
-                width: 50px;
-                height: 50px;
-                font-size: 24px;
+                width: 55px;
+                height: 55px;
+                font-size: 28px;
                 bottom: 20px;
                 top: auto;
                 transform: none;
@@ -325,6 +402,38 @@
                 top: 20px;
                 bottom: auto;
                 transform: translateX(-50%);
+                font-size: 16px;
+                padding: 10px 20px;
+            }
+            
+            .touch-area {
+                width: 70px;
+            }
+            
+            .page:hover::before,
+            .page:hover::after {
+                display: none; /* Hide hover effects on mobile */
+            }
+        }
+        
+        /* Print styles */
+        @media print {
+            .nav-btn,
+            .page-counter,
+            .fullscreen-btn,
+            .instructions,
+            .loader,
+            .touch-area {
+                display: none !important;
+            }
+            
+            body {
+                background: white !important;
+            }
+            
+            .book {
+                box-shadow: none !important;
+                filter: none !important;
             }
         }
     </style>
@@ -336,12 +445,13 @@
     <div class="book-container">
         <div class="book" id="book">
             <!-- Pages will be inserted by JavaScript -->
+            <div class="book-shadow"></div>
         </div>
         
         <button class="nav-btn prev-btn" id="prevBtn">←</button>
         <button class="nav-btn next-btn" id="nextBtn">→</button>
         
-        <div class="page-counter" id="pageCounter">📖 Page 1 of 20</div>
+        <div class="page-counter" id="pageCounter">📖 Cover</div>
         
         <!-- Touch areas for mobile -->
         <div class="touch-area touch-left" id="touchLeft"></div>
@@ -352,15 +462,16 @@
         
         <!-- Loading indicator -->
         <div class="loader" id="loader">
-            <span>Loading Story...</span>
+            <span>Loading Storybook...</span>
         </div>
     </div>
     
     <!-- Instructions popup -->
     <div class="instructions" id="instructions">
         <button class="close-btn" id="closeInstructions">×</button>
-        <h3>📚 How to Read</h3>
+        <h3>📚 How to Read Your Story</h3>
         <p>Tap the arrows or swipe to turn pages!</p>
+        <p>Click the corners for fun animations ✨</p>
         <p>Add to Home Screen for offline reading 📱</p>
     </div>
     
@@ -370,10 +481,11 @@
     </audio>
     
     <script>
-        // ===== CONFIGURATION =====
-        const TOTAL_PAGES = 20; // Change this for different book lengths
-        let currentPage = 1;
+        // ===== PHYSICAL BOOK CONFIGURATION =====
+        const TOTAL_IMAGES = 20; // Cover (1) + 18 content pages + Back cover (1)
+        let currentState = 0; // 0=cover, 1-9=spreads, 10=back cover
         let audioEnabled = true;
+        let isAnimating = false;
         
         // ===== DOM ELEMENTS =====
         const book = document.getElementById('book');
@@ -390,132 +502,227 @@
             const bubbles = document.getElementById('bubbles');
             const colors = ['#FFB6C1', '#FFD166', '#06D6A0', '#118AB2', '#FF6B6B'];
             
-            for (let i = 0; i < 15; i++) {
+            for (let i = 0; i < 20; i++) {
                 const bubble = document.createElement('div');
                 bubble.className = 'bg-bubble';
-                bubble.style.width = Math.random() * 100 + 50 + 'px';
-                bubble.style.height = bubble.style.width;
+                
+                const size = Math.random() * 120 + 60;
+                bubble.style.width = size + 'px';
+                bubble.style.height = size + 'px';
                 bubble.style.left = Math.random() * 100 + '%';
                 bubble.style.top = Math.random() * 100 + '%';
                 bubble.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                bubble.style.opacity = Math.random() * 0.3 + 0.1;
-                bubble.style.animation = `float ${Math.random() * 20 + 10}s infinite linear`;
-                
-                // Add floating animation
-                const style = document.createElement('style');
-                style.textContent = `
-                    @keyframes float {
-                        0% { transform: translate(0, 0) rotate(0deg); }
-                        25% { transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px) rotate(90deg); }
-                        50% { transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px) rotate(180deg); }
-                        75% { transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px) rotate(270deg); }
-                        100% { transform: translate(0, 0) rotate(360deg); }
-                    }
-                `;
-                document.head.appendChild(style);
+                bubble.style.opacity = Math.random() * 0.25 + 0.1;
+                bubble.style.animationDuration = (Math.random() * 25 + 15) + 's';
+                bubble.style.animationDelay = (Math.random() * 10) + 's';
                 
                 bubbles.appendChild(bubble);
             }
         }
         
-        // Load all pages
+        // Load all pages with 2:3 ratio
         function loadPages() {
             let loadedCount = 0;
+            let errorCount = 0;
             
-            for (let i = 1; i <= TOTAL_PAGES; i++) {
+            // Create all 20 pages
+            for (let i = 1; i <= TOTAL_IMAGES; i++) {
                 const pageNumber = i.toString().padStart(2, '0');
                 const page = document.createElement('div');
                 page.className = 'page';
                 page.id = `page-${i}`;
-                page.style.left = i % 2 === 1 ? '0%' : '50%';
-                page.style.zIndex = TOTAL_PAGES - i + 1;
                 
-                // Add page turn on click for the corner
-                if (i < TOTAL_PAGES) {
-                    page.addEventListener('click', (e) => {
-                        const rect = page.getBoundingClientRect();
-                        // Only trigger on right side (corner)
-                        if (e.clientX > rect.right - 50 && e.clientY < rect.top + 50) {
-                            nextPage();
-                        }
-                    });
+                // Set page position and class
+                if (i === 1) {
+                    // Cover - starts on right
+                    page.className += ' right-page cover';
+                    page.style.left = '50%';
+                    page.style.zIndex = 100;
+                } else if (i === TOTAL_IMAGES) {
+                    // Back cover - starts on left, hidden
+                    page.className += ' left-page back-cover';
+                    page.style.left = '0%';
+                    page.style.transform = 'rotateY(180deg)';
+                    page.style.zIndex = 1;
+                } else {
+                    // Content pages - alternate left/right
+                    if (i % 2 === 0) {
+                        page.className += ' left-page';
+                        page.style.left = '0%';
+                    } else {
+                        page.className += ' right-page';
+                        page.style.left = '50%';
+                    }
+                    // Even pages are behind odd pages
+                    page.style.zIndex = i % 2 === 0 ? TOTAL_IMAGES - i : TOTAL_IMAGES - i + 1;
                 }
                 
+                // Add image
                 const img = document.createElement('img');
                 img.src = `pages/${pageNumber}.jpg`;
                 img.alt = `Page ${i}`;
-                img.loading = i <= 4 ? 'eager' : 'lazy'; // Load first 4 pages immediately
+                img.loading = i <= 4 ? 'eager' : 'lazy';
                 
                 img.onload = function() {
                     loadedCount++;
-                    if (loadedCount === TOTAL_PAGES) {
-                        // All pages loaded
-                        setTimeout(() => {
-                            loader.style.display = 'none';
-                            showInstructions();
-                        }, 500);
-                    }
+                    checkAllLoaded();
                 };
                 
                 img.onerror = function() {
                     console.error(`Failed to load page ${i}`);
+                    errorCount++;
                     loadedCount++;
-                    if (loadedCount === TOTAL_PAGES) {
-                        loader.style.display = 'none';
-                    }
+                    checkAllLoaded();
                 };
                 
                 page.appendChild(img);
                 book.appendChild(page);
             }
             
+            function checkAllLoaded() {
+                if (loadedCount === TOTAL_IMAGES) {
+                    setTimeout(() => {
+                        loader.style.display = 'none';
+                        if (errorCount > 0) {
+                            console.warn(`${errorCount} images failed to load`);
+                        }
+                        showInstructions();
+                    }, 500);
+                }
+            }
+            
             updateDisplay();
         }
         
-        // ===== PAGE NAVIGATION =====
+        // ===== PHYSICAL BOOK NAVIGATION =====
         
         function updateDisplay() {
+            if (isAnimating) return;
+            
             // Update page counter
-            document.getElementById('pageCounter').textContent = 
-                `📖 Page ${currentPage} of ${TOTAL_PAGES}`;
+            let displayText = '';
+            if (currentState === 0) {
+                displayText = '📖 Cover';
+            } else if (currentState === 10) {
+                displayText = '📖 Back Cover';
+            } else {
+                const leftPage = currentState * 2;
+                const rightPage = leftPage + 1;
+                displayText = `📖 Pages ${leftPage}-${rightPage}`;
+            }
+            document.getElementById('pageCounter').textContent = displayText;
             
             // Update button states
-            document.getElementById('prevBtn').disabled = currentPage <= 1;
-            document.getElementById('nextBtn').disabled = currentPage >= TOTAL_PAGES - 1;
+            document.getElementById('prevBtn').disabled = currentState <= 0;
+            document.getElementById('nextBtn').disabled = currentState >= 10;
             
-            // Show current spread
-            document.querySelectorAll('.page').forEach(page => {
-                page.style.transform = 'rotateY(0deg)';
-            });
-            
-            // If we're on an odd page, show it and the next page
-            if (currentPage % 2 === 1 && currentPage < TOTAL_PAGES) {
-                const page1 = document.getElementById(`page-${currentPage}`);
-                const page2 = document.getElementById(`page-${currentPage + 1}`);
+            // Set initial positions for all pages
+            for (let i = 1; i <= TOTAL_IMAGES; i++) {
+                const page = document.getElementById(`page-${i}`);
+                if (!page) continue;
                 
-                if (page1) page1.style.transform = 'rotateY(0deg)';
-                if (page2) page2.style.transform = 'rotateY(0deg)';
+                if (i === 1) {
+                    // Cover
+                    if (currentState === 0) {
+                        page.style.transform = 'rotateY(0deg)';
+                        page.style.zIndex = 100;
+                    } else {
+                        page.style.transform = 'rotateY(-180deg)';
+                        page.style.zIndex = 1;
+                    }
+                } else if (i === TOTAL_IMAGES) {
+                    // Back cover
+                    if (currentState === 10) {
+                        page.style.transform = 'rotateY(0deg)';
+                        page.style.zIndex = 100;
+                    } else {
+                        page.style.transform = 'rotateY(180deg)';
+                        page.style.zIndex = 1;
+                    }
+                } else if (i % 2 === 0) {
+                    // Left pages
+                    const spreadNum = Math.floor(i / 2);
+                    if (spreadNum <= currentState) {
+                        page.style.transform = 'rotateY(0deg)';
+                    } else {
+                        page.style.transform = 'rotateY(-180deg)';
+                    }
+                } else {
+                    // Right pages
+                    const spreadNum = Math.floor((i - 1) / 2);
+                    if (spreadNum <= currentState) {
+                        page.style.transform = 'rotateY(0deg)';
+                    } else {
+                        page.style.transform = 'rotateY(180deg)';
+                    }
+                }
             }
         }
         
         function nextPage() {
-            if (currentPage < TOTAL_PAGES - 1) {
-                playPageTurnSound();
-                currentPage += 2;
-                updateDisplay();
-                return true;
+            if (currentState >= 10 || isAnimating) return;
+            
+            isAnimating = true;
+            playPageTurnSound();
+            
+            // Animate turning page
+            let pageToTurn;
+            if (currentState === 0) {
+                // Turn cover to reveal first spread
+                pageToTurn = document.getElementById('page-1');
+            } else if (currentState < 9) {
+                // Turn left page of current spread
+                pageToTurn = document.getElementById(`page-${currentState * 2}`);
+            } else if (currentState === 9) {
+                // Turn last spread to reveal back cover
+                pageToTurn = document.getElementById('page-18');
             }
-            return false;
+            
+            if (pageToTurn) {
+                pageToTurn.style.transition = 'transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                pageToTurn.style.transform = pageToTurn.classList.contains('left-page') 
+                    ? 'rotateY(-180deg)' 
+                    : 'rotateY(180deg)';
+            }
+            
+            // Update state after animation
+            setTimeout(() => {
+                currentState++;
+                isAnimating = false;
+                updateDisplay();
+            }, 1000);
         }
         
         function prevPage() {
-            if (currentPage > 1) {
-                playPageTurnSound();
-                currentPage -= 2;
-                updateDisplay();
-                return true;
+            if (currentState <= 0 || isAnimating) return;
+            
+            isAnimating = true;
+            playPageTurnSound();
+            
+            // Animate turning page back
+            let pageToTurn;
+            if (currentState === 10) {
+                // Turn back cover to reveal last spread
+                pageToTurn = document.getElementById('page-20');
+            } else if (currentState > 1) {
+                // Turn page back
+                pageToTurn = document.getElementById(`page-${(currentState - 1) * 2}`);
+            } else if (currentState === 1) {
+                // Turn first spread back to cover
+                pageToTurn = document.getElementById('page-2');
             }
-            return false;
+            
+            if (pageToTurn) {
+                pageToTurn.style.transition = 'transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                pageToTurn.style.transform = 'rotateY(0deg)';
+            }
+            
+            // Update state after animation
+            setTimeout(() => {
+                currentState--;
+                isAnimating = false;
+                updateDisplay();
+            }, 1000);
         }
         
         // ===== AUDIO FUNCTIONS =====
@@ -525,10 +732,13 @@
             
             try {
                 pageTurnSound.currentTime = 0;
-                pageTurnSound.play().catch(e => {
-                    console.log("Audio play failed:", e);
-                    // User might need to interact first
-                });
+                pageTurnSound.volume = 0.7;
+                const playPromise = pageTurnSound.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(e => {
+                        console.log("Audio play failed:", e);
+                    });
+                }
             } catch (e) {
                 console.log("Audio error:", e);
             }
@@ -539,8 +749,10 @@
         function showInstructions() {
             // Only show instructions on first visit
             if (!localStorage.getItem('instructionsShown')) {
-                instructions.style.display = 'block';
-                localStorage.setItem('instructionsShown', 'true');
+                setTimeout(() => {
+                    instructions.style.display = 'block';
+                    localStorage.setItem('instructionsShown', 'true');
+                }, 1000);
             }
         }
         
@@ -575,33 +787,54 @@
             if (e.key === 'ArrowRight' || e.key === ' ') nextPage();
             if (e.key === 'ArrowLeft') prevPage();
             if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+            if (e.key === 'Escape' && document.fullscreenElement) toggleFullscreen();
         });
         
         // Touch/swipe for mobile
         let touchStartX = 0;
         let touchEndX = 0;
+        let touchStartY = 0;
+        let touchEndY = 0;
         
         document.addEventListener('touchstart', (e) => {
             touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
         });
         
         document.addEventListener('touchend', (e) => {
             touchEndX = e.changedTouches[0].screenX;
+            touchEndY = e.changedTouches[0].screenY;
             handleSwipe();
         });
         
         function handleSwipe() {
             const swipeThreshold = 50;
-            const diff = touchStartX - touchEndX;
+            const verticalThreshold = 100;
+            const diffX = touchStartX - touchEndX;
+            const diffY = touchStartY - touchEndY;
             
-            if (Math.abs(diff) > swipeThreshold) {
-                if (diff > 0) {
+            // Only process horizontal swipes with minimal vertical movement
+            if (Math.abs(diffY) < verticalThreshold && Math.abs(diffX) > swipeThreshold) {
+                if (diffX > 0) {
                     nextPage(); // Swipe left
                 } else {
                     prevPage(); // Swipe right
                 }
             }
         }
+        
+        // Click page corners to turn
+        document.addEventListener('click', (e) => {
+            // Check if click is near right edge of book
+            const bookRect = book.getBoundingClientRect();
+            if (e.clientX > bookRect.right - 80 && e.clientY < bookRect.top + 80) {
+                nextPage();
+            }
+            // Check if click is near left edge of book
+            else if (e.clientX < bookRect.left + 80 && e.clientY < bookRect.top + 80) {
+                prevPage();
+            }
+        });
         
         // Close instructions
         closeInstructions.addEventListener('click', () => {
@@ -616,70 +849,96 @@
             fullscreenBtn.textContent = document.fullscreenElement ? '⛶' : '⛶';
         });
         
-        // ===== PWA SERVICE WORKER =====
+        // Enable audio after first user interaction
+        function enableAudio() {
+            audioEnabled = true;
+            // Try to unlock audio context
+            pageTurnSound.volume = 0;
+            pageTurnSound.play().then(() => {
+                pageTurnSound.pause();
+                pageTurnSound.currentTime = 0;
+                pageTurnSound.volume = 0.7;
+            }).catch(() => {});
+            
+            // Remove event listeners
+            document.removeEventListener('click', enableAudio);
+            document.removeEventListener('touchstart', enableAudio);
+            document.removeEventListener('keydown', enableAudio);
+        }
         
+        document.addEventListener('click', enableAudio, { once: true });
+        document.addEventListener('touchstart', enableAudio, { once: true });
+        document.addEventListener('keydown', enableAudio, { once: true });
+        
+        // PWA Service Worker for offline
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                // Simple service worker for offline capability
-                const swContent = `
-                    const CACHE_NAME = 'kids-flipbook-v1';
-                    const urlsToCache = [
-                        './',
-                        './index.html',
-                        './manifest.json',
-                        './preview.jpg'
-                    ];
+                // Simple service worker that caches pages
+                const swScript = `
+                    const CACHE_NAME = 'kids-storybook-v1';
                     
                     self.addEventListener('install', event => {
                         event.waitUntil(
                             caches.open(CACHE_NAME)
-                                .then(cache => cache.addAll(urlsToCache))
+                                .then(cache => {
+                                    return cache.addAll([
+                                        './',
+                                        './index.html',
+                                        './manifest.json',
+                                        './preview.jpg'
+                                    ]);
+                                })
                         );
                     });
                     
                     self.addEventListener('fetch', event => {
                         event.respondWith(
                             caches.match(event.request)
-                                .then(response => response || fetch(event.request))
+                                .then(response => {
+                                    if (response) {
+                                        return response;
+                                    }
+                                    return fetch(event.request).then(response => {
+                                        if(!response || response.status !== 200 || response.type !== 'basic') {
+                                            return response;
+                                        }
+                                        const responseToCache = response.clone();
+                                        caches.open(CACHE_NAME)
+                                            .then(cache => {
+                                                cache.put(event.request, responseToCache);
+                                            });
+                                        return response;
+                                    });
+                                })
                         );
                     });
                 `;
                 
-                // Create a Blob with the service worker content
-                const blob = new Blob([swContent], { type: 'application/javascript' });
+                // Create a Blob with the service worker
+                const blob = new Blob([swScript], { type: 'application/javascript' });
                 const swURL = URL.createObjectURL(blob);
                 
-                navigator.serviceWorker.register(swURL).catch(err => {
-                    console.log('ServiceWorker registration failed: ', err);
-                });
+                navigator.serviceWorker.register(swURL)
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
             });
         }
         
-        // ===== INITIALIZE =====
+        // Handle page visibility (pause/resume)
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && !isAnimating) {
+                updateDisplay();
+            }
+        });
         
+        // Initialize everything
         window.addEventListener('DOMContentLoaded', () => {
             createBubbles();
             loadPages();
-            
-            // Enable audio after user interaction (browser requirement)
-            document.addEventListener('click', () => {
-                audioEnabled = true;
-                // Try to play audio to unlock audio context
-                pageTurnSound.volume = 0;
-                pageTurnSound.play().then(() => {
-                    pageTurnSound.pause();
-                    pageTurnSound.currentTime = 0;
-                    pageTurnSound.volume = 1;
-                }).catch(() => {});
-            }, { once: true });
-        });
-        
-        // Handle page visibility (for mobile)
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) {
-                // Page became visible again
-                updateDisplay();
-            }
         });
     </script>
 </body>

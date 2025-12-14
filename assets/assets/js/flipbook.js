@@ -56,20 +56,34 @@ class Flipbook {
         hideLoading();
     }
     
-    async loadBookConfig() {
-        try {
-            // Load from URL parameter or default
-            const urlParams = new URLSearchParams(window.location.search);
-            const bookId = urlParams.get('book') || 'sample';
-            
-            // In a real app, you'd fetch this from a server
-            // For now, we'll use a sample configuration
-            this.bookData = {
-                id: 'sample',
-                title: 'My First Flipbook',
-                author: 'Your Name',
-                pages: []
-            };
+   async loadBookConfig() {
+    try {
+        // Get client ID from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const clientId = urlParams.get('client') || 'client1'; // Default to client1
+        
+        // Load the client's book configuration
+        this.bookData = getClientBook(clientId);
+        
+        // Set total pages from book data
+        this.TOTAL_PAGES = this.bookData.pages.length;
+        
+        // Update book title
+        if (this.bookTitle && this.bookData.title) {
+            this.bookTitle.textContent = this.bookData.title;
+        }
+        
+        console.log(`Loaded book for client: ${clientId}`);
+        
+    } catch (error) {
+        console.error('Error loading book config:', error);
+        showNotification('Error loading book', 'error');
+        
+        // Fallback to sample book
+        this.bookData = SAMPLE_BOOKS.sample;
+        this.TOTAL_PAGES = 20;
+    }
+};
             
             // Generate sample page data
             for (let i = 1; i <= this.TOTAL_PAGES; i++) {

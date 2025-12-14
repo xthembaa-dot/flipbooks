@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - FlipBook App</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <header>
+        <nav class="main-nav">
+            <a href="index.html" class="logo">📚 FlipBook Fun</a>
+            <div class="nav-links">
+                <a href="library.html">📖 Library</a>
+                <a href="about.html">ℹ️ About</a>
+                <a href="contact.html">📧 Contact</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="contact-container">
+        <h1>📧 Contact & Feedback</h1>
+        
+        <div class="contact-content">
+            <section class="contact-form-section">
+                <h2>Send Us a Message</h2>
+                <form id="contact-form">
+                    <div class="form-group">
+                        <label for="name">Name:</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="subject">Subject:</label>
+                        <select id="subject" name="subject">
+                            <option value="feedback">Feedback</option>
+                            <option value="bug">Bug Report</option>
+                            <option value="feature">Feature Request</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">Message:</label>
+                        <textarea id="message" name="message" rows="6" required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">Send Message</button>
+                </form>
+            </section>
+
+            <section class="contact-info-section">
+                <h2>Other Ways to Reach Us</h2>
+                
+                <div class="contact-method">
+                    <h3>📝 Bug Reports</h3>
+                    <p>Found a bug? Please describe the issue and how to reproduce it.</p>
+                </div>
+                
+                <div class="contact-method">
+                    <h3>💡 Feature Requests</h3>
+                    <p>Have an idea for a new feature? We'd love to hear it!</p>
+                </div>
+                
+                <div class="contact-method">
+                    <h3>📚 Book Suggestions</h3>
+                    <p>Want to see a specific book in our library? Let us know!</p>
+                </div>
+                
+                <div class="contact-method">
+                    <h3>🔧 Technical Support</h3>
+                    <p>Having trouble with the app? We're here to help.</p>
+                </div>
+                
+                <div class="contact-method">
+                    <h3>⏰ Response Time</h3>
+                    <p>We typically respond within 1-2 business days.</p>
+                </div>
+            </section>
+        </div>
+
+        <section class="faq-section">
+            <h2>❓ Frequently Asked Questions</h2>
+            
+            <div class="faq-item">
+                <h3>How do I upload my own book?</h3>
+                <p>Go to the Library page, click "Upload Your Own Book", and select your PDF or images.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h3>What file formats are supported?</h3>
+                <p>We support PDF, JPG, and PNG formats for book uploads.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h3>Is this app free?</h3>
+                <p>Yes! FlipBook App is completely free to use.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h3>Can I use this on mobile?</h3>
+                <p>Absolutely! The app works on all devices - desktop, tablet, and mobile.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h3>How do I turn off sound effects?</h3>
+                <p>Click the sound toggle button in the top-right corner of the flipbook.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Made with ❤️ for kids everywhere</p>
+        <p>© 2024 FlipBook App | <a href="privacy.html">Privacy Policy</a></p>
+    </footer>
+
+    <script src="assets/js/common.js"></script>
+    <script src="assets/js/contact.js"></script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Library - FlipBook App</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/library.css">
+</head>
+<body>
+    <header>
+        <nav class="main-nav">
+            <a href="index.html" class="logo">📚 FlipBook Fun</a>
+            <div class="nav-links">
+                <a href="library.html">📖 Library</a>
+                <a href="about.html">ℹ️ About</a>
+                <a href="contact.html">📧 Contact</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="library-container">
+        <h1>📚 Your Flipbook Library</h1>
+        <p class="subtitle">Choose a book to start reading!</p>
+
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Search books...">
+            <button id="search-btn">🔍</button>
+        </div>
+
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-category="all">All</button>
+            <button class="filter-btn" data-category="kids">Kids</button>
+            <button class="filter-btn" data-category="educational">Educational</button>
+            <button class="filter-btn" data-category="story">Story Books</button>
+        </div>
+
+        <div class="books-grid" id="books-grid">
+            <!-- Books will be loaded by JavaScript -->
+        </div>
+
+        <div class="upload-section">
+            <h2>➕ Upload Your Own Book</h2>
+            <div class="upload-area" id="upload-area">
+                <p>📁 Drag & drop PDF or images here</p>
+                <p>or</p>
+                <input type="file" id="file-input" accept=".pdf,.jpg,.png" multiple>
+                <label for="file-input" class="upload-btn">Choose Files</label>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Made with ❤️ for kids everywhere</p>
+        <p>© 2024 FlipBook App | <a href="privacy.html">Privacy Policy</a></p>
+    </footer>
+
+    <script src="assets/js/common.js"></script>
+    <script src="assets/js/library.js"></script>
+</body>
+</html>

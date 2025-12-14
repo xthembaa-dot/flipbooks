@@ -7,7 +7,7 @@ const CLIENT_BOOKS = {
         title: 'Client 1 Flipbook',
         author: 'Client 1',
         totalPages: 20,
-        coverImage: '/flipbooks/assets/clients/client1/01.jpg',
+        coverImage: 'assets/images/clients/client1/01.jpg',  // CORRECT PATH
         pages: []
     },
     client2: {
@@ -15,7 +15,7 @@ const CLIENT_BOOKS = {
         title: 'Client 2 Flipbook',
         author: 'Client 2',
         totalPages: 20,
-        coverImage: '/flipbooks/assets/clients/client2/01.jpg',
+        coverImage: 'assets/images/clients/client2/01.jpg',  // CORRECT PATH
         pages: []
     }
 };
@@ -29,7 +29,7 @@ for (let i = 1; i <= 20; i++) {
     CLIENT_BOOKS.client1.pages.push({
         id: i,
         type: i === 1 ? 'cover' : i === 20 ? 'backcover' : 'content',
-        imageUrl: `/flipbooks/assets/clients/client1/${pageNum}.jpg`,
+        imageUrl: `assets/images/clients/client1/${pageNum}.jpg`,  // CORRECT PATH
         text: i === 1 ? 'Cover Page' : i === 20 ? 'The End!' : `Page ${i}`
     });
     
@@ -37,7 +37,7 @@ for (let i = 1; i <= 20; i++) {
     CLIENT_BOOKS.client2.pages.push({
         id: i,
         type: i === 1 ? 'cover' : i === 20 ? 'backcover' : 'content',
-        imageUrl: `/flipbooks/assets/clients/client2/${pageNum}.jpg`,
+        imageUrl: `assets/images/clients/client2/${pageNum}.jpg`,  // CORRECT PATH
         text: i === 1 ? 'Cover Page' : i === 20 ? 'The End!' : `Page ${i}`
     });
 }

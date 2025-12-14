@@ -7,7 +7,7 @@ const CLIENT_BOOKS = {
         title: 'Client 1 Flipbook',
         author: 'Client 1',
         totalPages: 20,
-        coverImage: 'assets/clients/client1/01.jpg',
+        coverImage: '/flipbooks/assets/clients/client1/01.jpg',
         pages: []
     },
     client2: {
@@ -15,26 +15,31 @@ const CLIENT_BOOKS = {
         title: 'Client 2 Flipbook',
         author: 'Client 2',
         totalPages: 20,
-        coverImage: 'assets/clients/client2/01.jpg',
+        coverImage: '/flipbooks/assets/clients/client2/01.jpg',
         pages: []
     }
 };
 
-client1: {
-    id: 'client1',
-    title: 'Client 1 Flipbook',
-    author: 'Client 1',
-    totalPages: 20,
-    coverImage: `/flipbooks/assets/clients/client1/01.jpg`,  // Add /flipbooks/ here
-    pages: []
-},
-client2: {
-    id: 'client2', 
-    title: 'Client 2 Flipbook',
-    author: 'Client 2',
-    totalPages: 20,
-    coverImage: `/flipbooks/assets/clients/client2/01.jpg`,  // Add /flipbooks/ here
-    pages: []
+// Generate pages for each client
+for (let i = 1; i <= 20; i++) {
+    // Format: 01, 02, 03, etc.
+    const pageNum = i.toString().padStart(2, '0');
+    
+    // Client 1 pages
+    CLIENT_BOOKS.client1.pages.push({
+        id: i,
+        type: i === 1 ? 'cover' : i === 20 ? 'backcover' : 'content',
+        imageUrl: `/flipbooks/assets/clients/client1/${pageNum}.jpg`,
+        text: i === 1 ? 'Cover Page' : i === 20 ? 'The End!' : `Page ${i}`
+    });
+    
+    // Client 2 pages
+    CLIENT_BOOKS.client2.pages.push({
+        id: i,
+        type: i === 1 ? 'cover' : i === 20 ? 'backcover' : 'content',
+        imageUrl: `/flipbooks/assets/clients/client2/${pageNum}.jpg`,
+        text: i === 1 ? 'Cover Page' : i === 20 ? 'The End!' : `Page ${i}`
+    });
 }
 
 // Function to get book by client ID

@@ -290,3 +290,34 @@
     0% { background-position: 200% 0; }
     100% { background-position: -200% 0; }
 }
+
+/* Client book image styles */
+.page-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Fills the square, might crop edges */
+    display: block;
+}
+
+/* Optional: Use contain if you don't want any cropping */
+.page-image.contain {
+    object-fit: contain;
+    background-color: var(--background-color);
+}
+
+.page-text {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    text-align: center;
+    font-size: 1.2rem;
+}
+
+/* Make sure page content has no padding for full-bleed images */
+.page-content {
+    padding: 0;
+    position: relative;
+}

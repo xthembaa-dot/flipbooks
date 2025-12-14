@@ -55,7 +55,11 @@
 
 .page {
     width: 50%;
-    padding-bottom: 70%;
+    /* * FIX 1: Changed from 70% to 50% to make the height equal to the width (50% of the flipbook container),
+     * resulting in a perfect 1:1 square aspect ratio page.
+     */
+    padding-bottom: 50%; 
+    
     position: absolute;
     top: 0;
     transform-origin: left center;
@@ -63,7 +67,8 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     background-color: var(--paper-color);
     transition: transform 0.8s, z-index 0s 0.4s;
-    display: none;
+    /* Keeping 'display: none' initially, but the JS will override this */
+    display: none; 
     box-sizing: border-box;
     overflow: hidden;
     line-height: 1.4;
@@ -73,6 +78,9 @@
     font-size: clamp(14px, 2.5vw, 24px);
     text-align: center;
 }
+/* * IMPORTANT NOTE: You also need to verify that your .page-image rule 
+ * uses 'object-fit: contain;' to ensure images are not clipped inside this new square container.
+ */
 
 .page-content {
     position: absolute;

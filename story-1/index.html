@@ -1,223 +1,311 @@
-<script>
-    // ===== PHYSICAL BOOK CONFIGURATION =====
-    const TOTAL_IMAGES = 20; // Cover + 18 pages + Back cover
-    let currentState = 0; // 0 = cover alone, 1-9 = spreads, 10 = back cover alone
-    let audioEnabled = true;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    // ===== DOM ELEMENTS =====
-    const book = document.getElementById('book');
-    const loader = document.getElementById('loader');
-    const pageTurnSound = document.getElementById('pageTurnSound');
+    <!-- EDIT THESE 4 LINES FOR YOUR STORY -->
+    <meta property="og:title" content="The Adventure Bunny Story">
+    <meta property="og:description" content="A fun interactive storybook for children">
+    <meta property="og:image" content="preview.jpg">
+    <meta property="og:url" content="https://yourusername.github.io/flipbooks/story-1/">
     
-    // ===== INITIAL SETUP =====
+    <!-- EDIT THIS LINE FOR BROWSER TAB -->
+    <title>The Adventurous Bunny - Kids Story Book</title>
     
-    // Create background bubbles (same as before)
-    function createBubbles() {
-        // ... (same bubble code as before)
-    }
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FFB6C1">
     
-    // Load all pages
-    function loadPages() {
-        let loadedCount = 0;
+    <style>
+        /* SIMPLE RESET */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        // Create all 20 page divs
-        for (let i = 1; i <= TOTAL_IMAGES; i++) {
-            const pageNumber = i.toString().padStart(2, '0');
-            const page = document.createElement('div');
-            page.className = 'page';
-            page.id = `page-${i}`;
-            
-            // Set initial position
-            if (i === 1) {
-                // Cover: start on right
-                page.style.left = '50%';
-            } else if (i === TOTAL_IMAGES) {
-                // Back cover: start on left (but hidden)
-                page.style.left = '0%';
-                page.style.transform = 'rotateY(180deg)';
-            } else {
-                // Regular pages: alternate left/right
-                page.style.left = i % 2 === 0 ? '0%' : '50%';
-            }
-            
-            page.style.zIndex = TOTAL_IMAGES - i + 1;
-            
-            // Add image
-            const img = document.createElement('img');
-            img.src = `pages/${pageNumber}.jpg`;
-            img.alt = `Page ${i}`;
-            img.loading = i <= 3 ? 'eager' : 'lazy';
-            
-            img.onload = function() {
-                loadedCount++;
-                if (loadedCount === TOTAL_IMAGES) {
-                    setTimeout(() => {
-                        loader.style.display = 'none';
-                        showInstructions();
-                    }, 500);
-                }
-            };
-            
-            page.appendChild(img);
-            book.appendChild(page);
+        body {
+            background: linear-gradient(135deg, #FFE6E6 0%, #E6F7FF 100%);
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
         }
         
-        updateDisplay();
-    }
+        .flipbook-container {
+            width: 90vw;
+            height: calc(90vw * 0.666); /* 2:3 ratio */
+            max-width: 1000px;
+            max-height: 667px;
+            position: relative;
+            perspective: 1500px;
+        }
+        
+        .page {
+            position: absolute;
+            width: 50%;
+            height: 100%;
+            top: 0;
+            background: white;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transform-origin: left center;
+            transition: transform 0.8s ease;
+            overflow: hidden;
+        }
+        
+        .page img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* LEFT PAGE (even numbers) */
+        .page.left {
+            left: 0;
+            border-radius: 10px 0 0 10px;
+        }
+        
+        /* RIGHT PAGE (odd numbers) */
+        .page.right {
+            left: 50%;
+            border-radius: 0 10px 10px 0;
+        }
+        
+        /* NAVIGATION BUTTONS */
+        .nav-btn {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #FF6B6B;
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 100;
+        }
+        
+        .nav-btn:hover {
+            background: #FF8E53;
+        }
+        
+        .nav-btn:disabled {
+            background: #CCCCCC;
+            cursor: not-allowed;
+        }
+        
+        .prev-btn { left: 20px; }
+        .next-btn { right: 20px; }
+        
+        /* PAGE COUNTER */
+        .page-counter {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+        }
+        
+        /* LOADER */
+        .loader {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 20px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="flipbook-container" id="flipbook">
+        <!-- Pages will be added by JavaScript -->
+    </div>
     
-    // ===== PAGE NAVIGATION - PHYSICAL BOOK LOGIC =====
+    <button class="nav-btn prev-btn" id="prevBtn">←</button>
+    <button class="nav-btn next-btn" id="nextBtn">→</button>
     
-    function updateDisplay() {
-        // Reset all pages
-        document.querySelectorAll('.page').forEach(page => {
-            page.style.transform = 'rotateY(0deg)';
+    <div class="page-counter" id="pageCounter">Cover</div>
+    
+    <div class="loader" id="loader">Loading your storybook...</div>
+    
+    <!-- PAGE TURN SOUND -->
+    <audio id="pageSound" src="https://assets.mixkit.co/sfx/preview/mixkit-book-page-turn-1512.mp3" preload="auto"></audio>
+    
+    <script>
+        // ===== CONFIGURATION =====
+        // CHANGE THIS NUMBER IF YOU HAVE DIFFERENT PAGE COUNT
+        const TOTAL_PAGES = 20; // Cover (1) + 18 content pages + Back cover (1)
+        let currentPage = 1; // Start with cover (page 1)
+        
+        // ===== ELEMENTS =====
+        const flipbook = document.getElementById('flipbook');
+        const loader = document.getElementById('loader');
+        const pageSound = document.getElementById('pageSound');
+        
+        // ===== LOAD PAGES =====
+        function loadPages() {
+            for (let i = 1; i <= TOTAL_PAGES; i++) {
+                const page = document.createElement('div');
+                page.className = 'page';
+                page.id = `page${i}`;
+                
+                // Determine if left or right page
+                if (i === 1) {
+                    // Cover - starts on right
+                    page.className += ' right';
+                    page.style.left = '50%';
+                } else if (i === TOTAL_PAGES) {
+                    // Back cover - starts on left (hidden)
+                    page.className += ' left';
+                    page.style.left = '0%';
+                    page.style.transform = 'rotateY(180deg)';
+                } else {
+                    // Content pages
+                    if (i % 2 === 0) {
+                        page.className += ' left';
+                        page.style.left = '0%';
+                    } else {
+                        page.className += ' right';
+                        page.style.left = '50%';
+                    }
+                }
+                
+                // Add image
+                const img = document.createElement('img');
+                const pageNum = i.toString().padStart(2, '0');
+                img.src = `pages/${pageNum}.jpg`;
+                img.alt = `Page ${i}`;
+                
+                img.onload = function() {
+                    if (i === TOTAL_PAGES) {
+                        // All images loaded
+                        setTimeout(() => {
+                            loader.style.display = 'none';
+                        }, 500);
+                    }
+                };
+                
+                page.appendChild(img);
+                flipbook.appendChild(page);
+            }
+            
+            updateDisplay();
+        }
+        
+        // ===== UPDATE DISPLAY =====
+        function updateDisplay() {
+            // Update counter
+            let counterText = '';
+            if (currentPage === 1) {
+                counterText = 'Cover';
+            } else if (currentPage === TOTAL_PAGES) {
+                counterText = 'Back Cover';
+            } else {
+                counterText = `Page ${currentPage}`;
+            }
+            document.getElementById('pageCounter').textContent = counterText;
+            
+            // Update button states
+            document.getElementById('prevBtn').disabled = currentPage <= 1;
+            document.getElementById('nextBtn').disabled = currentPage >= TOTAL_PAGES;
+            
+            // Show current page
+            for (let i = 1; i <= TOTAL_PAGES; i++) {
+                const page = document.getElementById(`page${i}`);
+                if (i === currentPage) {
+                    page.style.transform = 'rotateY(0deg)';
+                    page.style.zIndex = TOTAL_PAGES - i + 10;
+                } else if (i < currentPage) {
+                    // Pages that have been turned
+                    page.style.transform = 'rotateY(-180deg)';
+                    page.style.zIndex = i;
+                } else {
+                    // Pages not yet turned
+                    page.style.transform = 'rotateY(0deg)';
+                    page.style.zIndex = TOTAL_PAGES - i;
+                }
+            }
+        }
+        
+        // ===== PAGE TURNING =====
+        function nextPage() {
+            if (currentPage < TOTAL_PAGES) {
+                playSound();
+                currentPage++;
+                updateDisplay();
+            }
+        }
+        
+        function prevPage() {
+            if (currentPage > 1) {
+                playSound();
+                currentPage--;
+                updateDisplay();
+            }
+        }
+        
+        function playSound() {
+            try {
+                pageSound.currentTime = 0;
+                pageSound.play().catch(e => console.log("Sound error:", e));
+            } catch (e) {
+                console.log("Sound error:", e);
+            }
+        }
+        
+        // ===== EVENT LISTENERS =====
+        document.getElementById('nextBtn').addEventListener('click', nextPage);
+        document.getElementById('prevBtn').addEventListener('click', prevPage);
+        
+        // Keyboard support
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextPage();
+            if (e.key === 'ArrowLeft') prevPage();
         });
         
-        // Update page counter
-        let displayText = '';
-        if (currentState === 0) {
-            displayText = 'Cover';
-        } else if (currentState === 10) {
-            displayText = 'Back Cover';
-        } else {
-            const leftPage = currentState * 2;
-            const rightPage = leftPage + 1;
-            displayText = `Pages ${leftPage}-${rightPage}`;
-        }
-        document.getElementById('pageCounter').textContent = displayText;
+        // Touch/swipe support
+        let startX = 0;
+        let endX = 0;
         
-        // Update button states
-        document.getElementById('prevBtn').disabled = currentState <= 0;
-        document.getElementById('nextBtn').disabled = currentState >= 10;
+        document.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+        });
         
-        // Show current state
-        if (currentState === 0) {
-            // Cover alone on right
-            const cover = document.getElementById('page-1');
-            if (cover) {
-                cover.style.transform = 'rotateY(0deg)';
-                cover.style.left = '50%';
-            }
-        } else if (currentState === 10) {
-            // Back cover alone on left
-            const backCover = document.getElementById(`page-${TOTAL_IMAGES}`);
-            if (backCover) {
-                backCover.style.transform = 'rotateY(0deg)';
-                backCover.style.left = '0%';
-            }
-        } else {
-            // Show spread: two pages
-            const leftPageNum = currentState * 2;
-            const rightPageNum = leftPageNum + 1;
+        document.addEventListener('touchend', (e) => {
+            endX = e.changedTouches[0].clientX;
+            const diff = startX - endX;
             
-            const leftPage = document.getElementById(`page-${leftPageNum}`);
-            const rightPage = document.getElementById(`page-${rightPageNum}`);
-            
-            if (leftPage) {
-                leftPage.style.transform = 'rotateY(0deg)';
-                leftPage.style.left = '0%';
-            }
-            if (rightPage) {
-                rightPage.style.transform = 'rotateY(0deg)';
-                rightPage.style.left = '50%';
-            }
-        }
-    }
-    
-    function nextPage() {
-        if (currentState < 10) {
-            playPageTurnSound();
-            
-            // Animate current page turning
-            if (currentState === 0) {
-                // Cover turns to reveal first spread
-                const cover = document.getElementById('page-1');
-                if (cover) {
-                    cover.style.transition = 'transform 0.8s cubic-bezier(0.42, 0, 0.58, 1)';
-                    cover.style.transform = 'rotateY(-180deg)';
-                }
-            } else if (currentState < 9) {
-                // Left page of current spread turns
-                const leftPageNum = currentState * 2;
-                const leftPage = document.getElementById(`page-${leftPageNum}`);
-                if (leftPage) {
-                    leftPage.style.transition = 'transform 0.8s cubic-bezier(0.42, 0, 0.58, 1)';
-                    leftPage.style.transform = 'rotateY(-180deg)';
-                }
-            } else if (currentState === 9) {
-                // Last spread turns to reveal back cover
-                const leftPageNum = currentState * 2; // page 18
-                const leftPage = document.getElementById(`page-${leftPageNum}`);
-                if (leftPage) {
-                    leftPage.style.transition = 'transform 0.8s cubic-bezier(0.42, 0, 0.58, 1)';
-                    leftPage.style.transform = 'rotateY(-180deg)';
+            if (Math.abs(diff) > 50) { // Minimum swipe distance
+                if (diff > 0) {
+                    nextPage(); // Swipe left
+                } else {
+                    prevPage(); // Swipe right
                 }
             }
+        });
+        
+        // Click corners to turn pages
+        document.addEventListener('click', (e) => {
+            const container = document.querySelector('.flipbook-container');
+            const rect = container.getBoundingClientRect();
             
-            // Move to next state after animation
-            setTimeout(() => {
-                currentState++;
-                updateDisplay();
-            }, 800);
-            
-            return true;
-        }
-        return false;
-    }
-    
-    function prevPage() {
-        if (currentState > 0) {
-            playPageTurnSound();
-            
-            // Animate going back
-            if (currentState === 10) {
-                // Back cover turns to reveal last spread
-                const backCover = document.getElementById(`page-${TOTAL_IMAGES}`);
-                if (backCover) {
-                    backCover.style.transition = 'transform 0.8s cubic-bezier(0.42, 0, 0.58, 1)';
-                    backCover.style.transform = 'rotateY(180deg)';
-                }
-            } else if (currentState > 1) {
-                // Show page turning back
-                const leftPageNum = (currentState - 1) * 2;
-                const leftPage = document.getElementById(`page-${leftPageNum}`);
-                if (leftPage) {
-                    leftPage.style.transition = 'transform 0.8s cubic-bezier(0.42, 0, 0.58, 1)';
-                    leftPage.style.transform = 'rotateY(0deg)';
-                }
-            } else if (currentState === 1) {
-                // First spread turns back to cover
-                const leftPageNum = 2; // page 2
-                const leftPage = document.getElementById(`page-${leftPageNum}`);
-                if (leftPage) {
-                    leftPage.style.transition = 'transform 0.8s cubic-bezier(0.42, 0, 0.58, 1)';
-                    leftPage.style.transform = 'rotateY(0deg)';
-                }
+            // Click in right 20% of container to go forward
+            if (e.clientX > rect.right - (rect.width * 0.2)) {
+                nextPage();
             }
-            
-            // Move to previous state after animation
-            setTimeout(() => {
-                currentState--;
-                updateDisplay();
-            }, 800);
-            
-            return true;
-        }
-        return false;
-    }
-    
-    // ===== AUDIO FUNCTIONS =====
-    function playPageTurnSound() {
-        if (!audioEnabled) return;
-        try {
-            pageTurnSound.currentTime = 0;
-            pageTurnSound.play().catch(e => console.log("Audio play failed"));
-        } catch (e) {
-            console.log("Audio error:", e);
-        }
-    }
-    
-    // ===== REST OF CODE (same as before) =====
-    // (Keep the instructions, fullscreen, event listeners, etc. from previous code)
-    // ... [rest of the code remains the same]
-</script>
+            // Click in left 20% of container to go back
+            else if (e.clientX < rect.left + (rect.width * 0.2)) {
+                prevPage();
+            }
+        });
+        
+        // ===== INITIALIZE =====
+        window.addEventListener('DOMContentLoaded', loadPages);
+    </script>
+</body>
+</html>

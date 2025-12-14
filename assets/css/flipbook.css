@@ -303,7 +303,12 @@
 .page-image {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Fills the square, might crop edges */
+    /* * *** FIX 2: Changed 'cover' to 'contain' ***
+     * 'cover' clips the image if the aspect ratios don't match (your original issue).
+     * 'contain' scales the entire image down to fit inside the square page 
+     * without cropping, ensuring the whole picture is visible.
+     */
+    object-fit: contain; 
     display: block;
 }
 

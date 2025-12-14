@@ -38,7 +38,57 @@ class Flipbook {
         }
         
         // Generate pages
-        this.generatePages();
+        generatePages() {
+    this.flipbook.innerHTML = '';
+    
+    // Generate pages from book data
+    for (let i = 1; i <= this.TOTAL_PAGES; i++) {
+        const isRightPage = i % 2 !== 0;
+        const sideClass = isRightPage ? 'right-page' : 'left-page';
+        const pageEl = document.createElement('div');
+        pageEl.id = `page-${i}`;
+        pageEl.className = `page ${sideClass}`;
+        
+        // Get page data - check if we have data for this page
+        const pageData = this.bookData.pages[i-1];
+        
+        if (pageData && pageData.imageUrl) {
+            // Client book with image
+            pageEl.innerHTML = `
+                <div class="page-content">
+                    <img src="${pageData.imageUrl}" 
+                         alt="${pageData.text || 'Page ' + i}" 
+                         class="page-image">
+                    ${pageData.text ? `<div class="page-text">${pageData.text}</div>` : ''}
+                </div>
+            `;
+        } else {
+            // Fallback: no image available
+            pageEl.innerHTML = `
+                <div class="page-content">
+                    <p>Page ${i}</p>
+                    <p>Content for page ${i}</p>
+                </div>
+            `;
+        }
+        
+        this.flipbook.appendChild(pageEl);
+    }
+    
+    // Add controls container
+    const controlsContainer = document.createElement('div');
+    controlsContainer.className = 'controls';
+    controlsContainer.innerHTML = `
+        <button id="prev-btn" class="nav-button" disabled>◀️</button>
+        <button id="next-btn" class="nav-button">▶️</button>
+    `;
+    this.flipbook.appendChild(controlsContainer);
+    
+    // Update page references
+    this.pages = document.querySelectorAll('.page');
+    this.prevBtn = document.getElementById('prev-btn');
+    this.nextBtn = document.getElementById('next-btn');
+};
         
         // Initialize sound
         this.sound = new Audio('assets/sounds/page-flip.mp3');
